@@ -1,0 +1,657 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>MarkoDasic</name>
+    </assembly>
+    <members>
+        <member name="M:MarkoDasic.Controllers.ApartmentController.Get(Apartment.Application.UseCase.DTO.FilterPaginationApartmentDto,Apartment.Application.UseCase.Queries.Apartment.IGetAllApartmentsQuery)">
+            <summary>
+            Preglde apartmana uz filtriranje i paginaciju - autorizovani i  neautorizovani korisnici.   
+            </summary>
+            <param name="request"></param>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks>
+             Ukoliko se neki od parametara ostavi prazan, taj parametar se nece uzimati u obzir pri filtriranju. Ukoliko je u pitanju paginacija
+                onda ce se prikazati svi apartmani zajedno. Apartmani se ne vracaju sa svi svojim podacima (bez komentara, slikama...), vec samo sa najosnovnijim podacima.
+                
+            title => "Sofia",
+            minPrice => 0,
+            maxPrice => 10000,
+            CategoryId => 0,
+            pageNumber=> 100,
+            pageSize => 10
+            
+            </remarks>
+            <response code="200">Success</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ApartmentController.Get(System.Int32,Apartment.Application.UseCase.Queries.Apartment.IGetOneApartmentQuery)">
+            <summary>
+            Pregled pojedinacnog apartmana - autorizovani i  neautorizovani korisnici.  
+            </summary>
+            <param name="id"></param>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks>
+                Dohvatanje pojedinacnog apartmana sa svim njegovim detaljima, komentarima, slikama, ocenama itd. 
+                Prosledite Id => 1 kako biste sigurno dohvatili jedan apartman
+            </remarks>
+            <response code="200">Success</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ApartmentController.Put(Apartment.Application.UseCase.DTO.CreateApartmentDto,Apartment.Application.UseCase.Commands.Apartment.ICreateApartmentCommand)">
+             <summary>
+             Dodavanje apartmana - autorizovani korisnici sa odredjenim(IdUseCase => 5) privilegijama.  
+             </summary>
+             <param name="obj"></param>
+             <param name="createApartmentCommand"></param>
+             <returns></returns>
+             <remarks>
+             
+                 Thumb slika, kao i ostale slike se salju u formi base64. Ukoliko se Prioritet ne definise podrazumevana vrednost ce biti 3;
+                 Prioritet na kazuje da li ce se apartman videti na vrhu ili dnu stranice. 
+            
+             
+             {
+                 "title":"Peti najbolji Apartman (inserted)",
+                 "description": "desc",
+                   "geoLocationX": "string",
+                  "geoLocationY": "string",
+                  "categoryId": 1,
+                  "cityId": 1,
+                  "file": "uneti sliku u base64 formatu",
+                  "fileId": 0,
+                  "price": {
+                    "pricePerNight": 500,
+                    "pricePerNightWeekend": 900,
+                    "priceOnHoliday":1000
+                  },
+                  "imagesIds": [
+            
+                   ],
+                  "images": [
+                    "string"
+                  ],
+                  "priority": 1
+             }
+             </remarks>
+             <response code="201">Inserted</response>
+             <response code="400">Bad Request</response>
+             <response code="401">Unauthorized</response>
+             <response code="422">Unprocessable Entity</response>
+             <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ApartmentController.Patch(Apartment.Application.UseCase.DTO.UpdateApartmentDto,Apartment.Application.UseCase.Commands.Apartment.IUpdateApartmentCommand)">
+             <summary>
+             Azuriranje apartmana - autorizovani korisnici sa odredjenim(IdUseCase => 23) privilegijama.  
+             </summary>
+             <param name="obj"></param>
+             <param name="command"></param>
+             <returns></returns>
+             <remarks>
+                      Prilikom azuriranja podataka, prosledjuju se svi podaci objekta koji se azurira. Tacnje ukoliko se azurira samo naziv, potrebno je u request-u posalti i sve ostale informacije. Funkcionalnost je zamisljena tako sto bi korisnik na front dobio sve podatke o nekom apartmanu i njih izmenio ukoliko to zeli i vratio nazad na server. Azuriraju se samo oa polja koja su promenjena,ne i ceo objekat.   
+                      Ukoliko se ne proslede svi Id-evi slika ili ukoliko se prosledi samo nekolicina Id-eva slika, smatrace se da su slike ciji Id-evi nisu prosledjeni izbrisanim.
+             {
+                 "id":13,
+                 "title":"Treci najbolji Apartman (edit)",
+                 "description": "desc",
+                   "geoLocationX": "string",
+                  "geoLocationY": "string",
+                  "categoryId": 1,
+                  "cityId": 1,
+                  "file": "uneti sliku u base64 formatu",
+                  "fileId": 45,
+                  "price": {
+                    "pricePerNight": 8000,
+                    "pricePerNightWeekend": 9000,
+                    "priceOnHoliday":10000
+                  },
+                  "imagesIds": [
+            
+                   ],
+                  "images": [
+                    "string"
+                  ],
+                  "priority": 5
+             }
+             
+             </remarks>
+             <response code="204">Updated</response>
+             <response code="401">Unauthorized</response>
+             <response code="422">Unprocessable Entity</response>
+             <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ApartmentController.Delete(System.Int32,Apartment.Application.UseCase.Commands.Apartment.IDeleteApartmentCommand)">
+            <summary>
+            Brisanje apartmana - autorizovani korisnici sa odredjenim (IdUseCase => 25) privilegijama.  
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+               Aminstrator moze obrisati bilo koji apartman u aplikaciji, ali se primenjuje tzv. "soft delete" tako da podaci ostaju fizicnki u bazi podataka.
+               
+            Prosledite Id => 14 Kako biste bili sigurni da se jedan apartman obrisali.
+            </remarks>
+            <response code="204">Deleted</response>
+            <response code="401">Unauthorized</response>
+            <response code="409">Conflict</response>
+            <response code="404">Not Found Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <!-- Badly formed XML comment ignored for member "M:MarkoDasic.Controllers.CategoryController.Get(Apartment.Application.UseCase.Queries.Category.IGetAllCategoriesQuery)" -->
+        <!-- Badly formed XML comment ignored for member "M:MarkoDasic.Controllers.CategoryController.Put(Apartment.Application.UseCase.DTO.CreateCategoryDto,Apartment.Application.UseCase.Commands.Category.ICreateCategoryCommand)" -->
+        <!-- Badly formed XML comment ignored for member "M:MarkoDasic.Controllers.CityController.Get(Apartment.Application.UseCase.Queries.City.IGetAllCityQuery)" -->
+        <member name="M:MarkoDasic.Controllers.CityController.Put(Apartment.Application.UseCase.DTO.CityDto,Apartment.Application.UseCase.Commands.City.ICreateCityCommand)">
+            <summary>
+            Dodavanje grad - autorizovani korisnici sa odredjenim (IdUseCase => 7) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+               Administratori mogu dodavati gradove.
+               
+            {
+                "name":"Kragujevac"
+            }
+            </remarks>
+            <response code="201">Inserted</response>
+            <response code="401">Unauthorized</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.CommentController.Put(Apartment.Application.UseCase.DTO.CreateCommentDto,Apartment.Application.UseCase.Commands.Comment.ICreateCommentCommand)">
+             <summary>
+             Dodavanje komentara na apartman - autorizovani korisnici sa odredjenim (IdUseCase => 50) privilegijama.  
+             </summary>
+             <param name="obj"></param>
+             <param name="command"></param>
+             <returns return="ApartmentDto"></returns>
+             <remarks>
+                     Svaki autorizovani korisnik moze komentarisati bilo koji apartman. Takodje moze odgovarati drugi korisnicima na komenatre.
+                     
+            {
+             "apartmentId":1,
+             "parrentId":0,
+             "text": "Komentar 111"
+             }
+             </remarks>
+             <response code="201">Inserted</response>
+             <response code="401">Unauthorized</response>
+             <response code="401">Unauthorized</response>
+             <response code="422">Unprocessable Entity</response>
+             <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.CommentController.Delete(System.Int32,Apartment.Application.UseCase.Commands.Comment.IDeleteCommentYourSelfCommand)">
+            <summary>
+            Korisnikcko brisanje sopstvenog apartmana - autorizovani korisnici sa odredjenim(IdUseCase => 54) privilegijama.  
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+               Korisnik moze obrisati svoji komentar. Ukoliko je njegov komentar imao decu komentare onda se i oni automatski brisu sa njim.
+            </remarks>
+            <response code="204">Deleted</response>
+            <response code="401">Unauthorized</response>
+            <response code="409">Conflict</response>
+            <response code="404">Not Found Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.CommentController.Delete(System.Int32,Apartment.Application.UseCase.Commands.Comment.IDeleteCommentCommand)">
+            <summary>
+            Administratorsko risanje bilo kog apartmana - autorizovani korisnici sa odredjenim(IdUseCase => 29) privilegijama.  
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+                Administrator moze obrisati bilo koji komentar, ukoliko izbrisani komentar sadrzi decu komentare, onda ce i deca biti obrisana. Koristis se soft delete.   
+            </remarks>
+            <response code="204">Deleted</response>
+            <response code="401">Unauthorized</response>
+            <response code="409">Conflict</response>
+            <response code="404">Not Found Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.RateController.Put(Apartment.Application.UseCase.DTO.CreateRateDto,Apartment.Application.UseCase.Commands.Rate.ICreateRateCommand)">
+            <summary>
+            Dodavanje ocene na apartman - autorizovani korisnici sa odredjenim(IdUseCase => 51) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns></returns>
+            <remarks>
+              Svaki autorizovani korisnik moze ostaviti samo jednom ocenu na jedan apartman u rasponu od 1 do 5.
+              Ulogovati se kao (markodasic70@gmail.com, VisokaIct1) 
+            {
+                "apartmentId":1,
+                "value":5
+            }
+            
+            </remarks>
+            <response code="201">Inserted</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ReportController.Get(Apartment.Application.UseCase.Queries.Report.IGetAllReportQuery)">
+            <summary>
+            Preglde svih reporta apartmna - autorizovani korisnici sa odredjenim (IdUseCase => 8) privilegijama.  
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks>
+                Administratori mogu dohvatiti sve reoprtove koje su korisnici slali za odredjene apartmane.
+            </remarks>
+            <response code="200">Success</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ReportController.Get1(Apartment.Application.UseCase.Queries.Report.IGetAllReportLineQuery)">
+            <summary>
+            Preglde svih ponudjenih stavki reporta (pre slanja reporta korisnik mora odabrati jednu od ponudjenih stavki) - neautorizovani i autorizovani korisnici.  
+            </summary>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks>
+                Korisnici mogu videti sve ponudjene stavke prilikom slanja reporta na apartman. Postoji poseban red u tabeli ReportLines koji sluzi za slobodan unos teksta ukoliko je report specificne prirode.
+            </remarks>
+            <response code="200">Success</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ReportController.Post(Apartment.Application.UseCase.DTO.CreateReportLineDto,Apartment.Application.UseCase.Commands.Report.ICreateReportLineCommand)">
+            <summary>
+            Dodavanje jedne od stavki reporta (koje korisnik bira prilikom reporta apartmana) - autorizovani korisnici sa odredjenim (IdUseCase => 24) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns></returns>
+            <remarks>
+            Aministratori kreiraju nove ponudjene stavke koje ce korisnici moci odabrati prilikom reportovanja.
+            
+            {
+                "name":"Ugrozavanje zivotinja"
+            {
+            </remarks>
+            <response code="201">Inserted</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ReportController.Put(Apartment.Application.UseCase.DTO.CreateReportDto,Apartment.Application.UseCase.Commands.Report.ICreateReportCommand)">
+            <summary>
+            Reportovanje apartmana od strane korisnika  - autorizovani korisnici sa odredjenim(IdUseCase => 16) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns></returns>
+            <remarks>
+            Prilikom slanja reporta klijent salje Id reportLine i opcioni tekst i Id apartmana, svi ovi podaci se upisuju u veznu tabelu "Report"
+            Ulogovati se kao (markodasic70@gmail.com, VisokaIct1);
+            {
+                "text":"Narusavanje autorskih prave i propagiranje nasilja!",
+                "apartmentId": 1,
+                "reportLineId" : 1
+            }
+            </remarks>
+            <response code="201">Inserted</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ReservationController.Get(Apartment.Application.UseCase.DTO.FilterPaginationReservationDto,Apartment.Application.UseCase.Queries.Apartment.IGetAllReservationQuery)">
+            <summary>
+            Preglde svih rezervacija apartmna Uz omoguceno filtriranje i paginaciju - autorizovani korisnici sa odredjenim (IdUseCase => 26) privilegijama.  
+            </summary>
+            <param name="request"></param>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks>
+             Moguce je filtrirati pretragu rezervacija po datumu, Id apartmana, da li je placeno. Takodje s unosom broja zeljenih stranica za brikaz kao i velicine tih stranica relaizuje paginacija
+             
+            CreatedAtFrom predstavlja datum od kada rezervacija pocinje,  CreatedAtTo predstavlja do kada je apartman rezervisan. 
+            
+            CreatedAtFrom => "2000-05-11T21:13:31.594Z"
+            CreatedAtTo => "2030-05-11T21:13:31.594Z"
+            isPaid = false
+            
+            </remarks>
+            <response code="200">Success</response>
+            <response code="400">Bad request</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ReservationController.Put(Apartment.Application.UseCase.DTO.CreateReservationDto,Apartment.Application.UseCase.Commands.Apartment.ICreateReservationsCommand)">
+            <summary>
+            Dodavanje rezervacije apartmana - autorizovani korisnici sa odredjenim(IdUseCase => 17) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns></returns>
+            <remarks>  
+                Korinsik kreira rezervaciju unosenjem Id apartmana, datumo od, do. Ukoliko je apartman zauzet nekim danima koje spadaju u opseg u kom je korisnik zeleo da ga rezervise, bice obavesten porukom da je termin zauzet.
+                
+            
+            {
+                "apartmentId":1,
+                "from":"2025-05-11T21:13:31.594Z",
+                "to":"2025-06-11T21:13:31.594Z"
+            
+            }
+            
+            </remarks>
+            <response code="201">Inserted</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.ReservationController.Delete(System.Int32,Apartment.Application.UseCase.Commands.Apartment.IDeleteReservationCommand)">
+            <summary>
+            Brisanje Rezervacija od strane admina - autorizovani korisnici sa odredjenim (IdUseCase => 28) privilegijama.  
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+                Aministrator moze brisati sve rezervacije (soft delete).
+                proslediti id => 16 kako biste sigurno obrisali jednu rezervacju
+            </remarks>
+            <response code="204">Deleted</response>
+            <response code="401">Unauthorized</response>
+            <response code="409">Conflict</response>
+            <response code="404">Not Found Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.SpecificationController.Get(Apartment.Application.UseCase.Queries.Specification.IGetAllSpecificationQuery)">
+             <summary>
+             Pregled svih specifikacija apartmana - autorizovani i  neautorizovani korisnici.  
+             </summary>
+             <param name="query"></param>
+             <returns></returns>
+             <remarks>
+                 Svaki korisnik moze dohvatiti sve postojece specifikacije. 
+            
+             </remarks>
+             <response code="200">Success</response>
+             <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.SpecificationController.Post(Apartment.Application.UseCase.DTO.ApartmentSpecificationDto,Apartment.Application.UseCase.Commands.Specification.ICreateApartmentSpecificatonCommand)">
+            <summary>
+            Dodavanje jedne secifikacije i njene vrednosti jednom apartmanu - autorizovani korisnici sa odredjenim (IdUseCase => 52) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns></returns>
+            <remarks>
+               Klijent prosledjuje Id aprtmana, Id specifikacije kao i vrenost te specifikacije u vidu teksta koji rucno dodaje. Svi podaci se upisuju u veznu tabelu.
+            
+            {
+                "apartmentId":1,
+                "specificationId":1,
+                "value":3
+            }
+            
+            
+            </remarks>
+            <response code="201">Inserted</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.SpecificationController.Put(Apartment.Application.UseCase.DTO.SpecificationDto,Apartment.Application.UseCase.Commands.Specification.ICreateSpecificationCommand)">
+            <summary>
+            Dodavanje pojedinacne vrste specifikacije (u posebnu tabelu koja sadrzi sve specifikacije koje se kasnije spajaju veznom tabelom sa apartmanima) - autorizovani korisnici sa odredjenim(IdUseCase => 22) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns></returns>
+            <remarks>
+                Dodavanje nove vrste specijikacije. Klijent prosledjue samo naziv specifikacije. Ta specifikacije ce kasnije biti dostupna za pridruzivanje apartmanima.
+                
+            {
+                "name":"Wi Fi"
+            }
+            
+            </remarks>
+            <response code="201">Inserted</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.Get(Apartment.Application.UseCase.DTO.FilterPaginationUserDto,Apartment.Application.UseCase.Queries.User.IGetAllUsersQuery)">
+            <summary>
+            Pregled svi korisnika u aplikaciji uz mogucnost filtriranja i paginacije - autorizovani korisnici sa odredjenim(IdUseCase => 4) privilegijama.  
+            </summary>
+            <param name="obj"></param>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks> 
+            Administrator moze dohvatiti sve korisnike, kao i filtrirati korisnike po: imenu i prezimenu, po datumu kreiranja u formi od-do. Tkoadje je omogucena paginacija poljima pageNumber (broji stranica koji treba da se prikaze) i pageSize (broji korisnika koji treba prikazati po strnaici)
+            
+            Mozete uneti sledece podatke kako biste zasigurno dobili rezultat
+            [
+             FullName => "Marko"
+             CreatedAtFrom => 2022-06-11T21:04:32.331Z
+             CreatedAtTo => 2024-06-11T21:04:32.331Z
+             PageNumber => 100
+             PageSize => 10
+            ]
+            </remarks>
+            <response code="200">Success</response>
+            <response code="400">Bad Request</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.GetYourSelf(Apartment.Implementation.UseCase.Queries.Ef.User.GetYourSelfQuery,Apartment.Domain.IUser)">
+            <summary>
+            Korisnicki pregled sopstvenog profila - svaki autorizovani korisnici.  
+            </summary>
+            <param name="user"></param>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks>
+                Korisnik moze sam dohvatiti svoje podatke. Id korisnika se izvlazi iz JWT tokena.
+            </remarks>
+            <response code="200">Success</response>
+            <response code="400">Bad Request</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.Get(System.Int32,Apartment.Application.UseCase.Queries.User.IGetOneUserQuery)">
+            <summary>
+            Pregled pojedinacnog korisnika u aplikaciji - autorizovani korisnici sa odredjenim(IdUseCase => 3) privilegijama.  
+            </summary>
+            <param name="id"></param>
+            <param name="query"></param>
+            <returns></returns>
+            <remarks>
+            Administratori mogu dohvatiti sve detaljne informacije o korisniku prosledjivanjem Id korz url {user/id};
+            
+            {
+                "id":1
+            }
+            </remarks>
+            <response code="200">Success</response>
+            <response code="400">Bad Request</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.Post(MarkoDasic.DTO.LogInUserDto,MarkoDasic.Core.JwtManager)">
+            <summary>
+            Log In korisnika na platformu pmocu JWT tokena - neautorizovani korisnici.  
+            </summary>
+            <param name="obj"></param>
+            <param name="manager"></param>
+            <returns></returns>
+            <remarks>
+            Korisnik se loguje na aplikaciju putem emaila i passworda. njegovi podaci se beleze u token koji se vraca klijentu u vidu teksta. Tokeni se skladiste u lokalnu memoriju aplikacije tako da je potrebno ulogovati se svaki put nakon gasenje aplikacije, jer se svi token brisu iz memorije nekon gasenje aplikacije.
+            
+            {
+                "email":"markodasic70@gmail.com",
+                "password":"VisokaIct1"
+            }
+            </remarks>
+            <response code="200">Success</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.Put(Apartment.Application.UseCase.DTO.CreateUserDto,Apartment.Application.UseCase.Commands.User.ICreateUserCommand)">
+             <summary>
+             Registracija korisnika na platformu - neautorizovani korisnici.  
+             </summary>
+             <param name="obj"></param>
+             <param name="createUserCommand"></param>
+             <returns></returns>
+             <remarks>
+             Korisnik se moze registrovati. Nakon uspesne registracije korisniku ce biti poslat mejl dobrodoslice. Unique ogranicenja  su sledeca: broji telefona i email adresa ne smeju biti isti. Ova logika je resena u vlaidatorima, cak i ukoliko je neki korisnik obrisan (zbog soft delete se njegovi podaci idalje fizicki cuvaju u bazi ) moguce je kreirati novog korisnika sa istom email adresom ili borjem telefona, ali samo ukoliko je korisnik koji vec poseduje istu emai adresu ili br. telefona obrisan.
+             
+             {
+                 "firstName":"Dasic",
+                 "lastName":"Marko"
+                 "email":"markodasic70@gmail.com",
+                 "password":"VisokaIct1",
+                 "phone":"+381652254864",
+            }
+             
+             
+             </remarks>
+             <response code="201">Inserted</response>
+             <response code="400">Bad Request</response>
+             <response code="401">Unauthorized</response>
+             <response code="422">Unprocessable Entity</response>
+             <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.Patch(Apartment.Application.UseCase.DTO.UpdateUserDto,Apartment.Application.UseCase.Commands.User.IUpdateUserCommand)">
+            <summary>
+            Azuriranje korisnika od strane administratora.- autorizovani korisnici sa odredjenim(IdUseCase => 9) privilegijama. 
+            </summary>
+            <param name="obj"></param>
+            <param name="command"></param>
+            <returns></returns>
+            <remarks>
+             Administratori mogu azurirati bilo kog korisnika sistema. Prilikom azuriranja potrebno je da se proslede svi postojeci podaci korisnika. Ukoliko je neki od podataka promenjen to ce se detektovati i azurirace se samo ta svojstva objekta koji se azurira.
+             
+            {
+                "id": 1,
+                "firstName":"Dasic",
+                "lastName":"Marko"
+                "email":"markodasic70@gmail.com",
+                "password":"VisokaIct1",
+                "phone":"+381652254864",
+                "cityId":1,
+                "useCaseIds":[]
+            }
+            </remarks>
+            <response code="204">Updated</response>
+            <response code="400">Bad Request</response>
+            <response code="401">Unauthorized</response>
+            <response code="422">Unprocessable Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.PatchYourSelf(Apartment.Application.UseCase.DTO.UpdateUserDto,Apartment.Domain.IUser,Apartment.Implementation.UseCase.Commands.Ef.User.UpdateYourSelfCommand)">
+             <summary>
+             Korisnicko azuriranje sopstvenog naloga.- autorizovani korisnici sa odredjenim(IdUseCase => 55) privilegijama. 
+             </summary>
+             <param name="obj"></param>
+             <param name="user"></param>
+             <param name="command"></param>
+             <returns></returns>
+             <remarks>  
+            Korisnici  mogu azurirati svoji nalog na sistemu. Prilikom azuriranja potrebno je da se proslede svi postojeci podaci korisnika. Ukoliko je neki od podataka promenjen to ce se detektovati i azurirace se samo ta svojstva objekta koji se azurira.
+             Ovim izvrsavanjem se nece azurirati niz useCaseIds, jer ukoliko je prosledjen prazan niz, nece se vrsiti azurianje.
+             {
+                 ,
+                 "firstName":"Dasic",
+                 "lastName":"Marko"
+                 "email":"markodasic70@gmail.com",
+                 "password":"VisokaIct1",
+                 "phone":"+381652254864",
+                 "cityId":1,
+                 "useCaseIds":[]
+             }
+             
+             
+             </remarks>
+             <response code="204">Updated</response>
+             <response code="400">Bad Request</response>
+             <response code="401">Unauthorized</response>
+             <response code="422">Unprocessable Entity</response>
+             <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.Delete(System.Int32,Apartment.Application.UseCase.Commands.User.IDeleteUserCommand)">
+            <summary>
+            Brisanje korisnika od strane administratora - autorizovani korisnici sa odredjenim(IdUseCase => 27) privilegijama.  
+            </summary>
+            <param name="id"></param>
+            <param name="command"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+               
+            </remarks>
+            <response code="204">Deleted</response>
+            <response code="401">Unauthorized</response>
+            <response code="409">Conflict</response>
+            <response code="404">Not Found Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.DeleteYourSelf(Apartment.Application.UseCase.Commands.User.IDeleteYourSelfCommand,MarkoDasic.Core.TokenStorage.ITokenStorage)">
+            <summary>
+            Korisnicko Brisanje sopstvenog naloga i automatski log out - autorizovani korisnici sa odredjenim(IdUseCase => 53) privilegijama.  
+            </summary>
+            <param name="command"></param>
+            <param name="token"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+                Korisnik moze izbrisati sam svoji nalog. Nakon brisnaja njegov token ce automatski biti unisten. Koristi se Sof Delete
+            </remarks>
+            <response code="204">Deleted</response>
+            <response code="401">Unauthorized</response>
+            <response code="409">Conflict</response>
+            <response code="404">Not Found Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserController.InvalidateToken(MarkoDasic.Core.TokenStorage.ITokenStorage)">
+            <summary>
+            Log out - svaki autorizovani korisnik.  
+            </summary>
+            <param name="storage"></param>
+            <returns return="ApartmentDto"></returns>
+            <remarks>
+                Token se unistava.
+            </remarks>
+            <response code="204">Deleted</response>
+            <response code="401">Unauthorized</response>
+            <response code="409">Conflict</response>
+            <response code="404">Not Found Entity</response>
+            <response code="500">Unexpected server error.</response>
+        </member>
+        <member name="M:MarkoDasic.Controllers.UserUseCase.Put(Apartment.Application.UseCase.DTO.AddUseCaseDto,Apartment.Application.UseCase.Commands.UseCase.IAddUseCaseCommand)">
+             <summary>
+             Dodavanje odredjenih privilegija (IdUseCase) korisnika od strane administratora na platformu - autorizovani korisnici sa odredjenim(IdUseCase => 1) privilegijama.  
+             </summary>
+             <param name="obj"></param>
+             <param name="command"></param>
+             <returns></returns>
+             <remarks>
+            {
+             "userId":1,
+             "useCaseIds":[101]
+             }
+            
+            
+             </remarks>
+             <response code="201">Inserted</response>
+             <response code="400">Bad Request</response>
+             <response code="401">Unauthorized</response>
+             <response code="422">Unprocessable Entity</response>
+             <response code="500">Unexpected server error.</response>
+        </member>
+    </members>
+</doc>
